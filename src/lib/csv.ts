@@ -43,8 +43,27 @@ export function expensesToCSV(expenses: Expense[]): string {
   return rows.join("\r\n");
 }
 
-export function downloadCSV(expenses: Expense[], filename?: string): void {
-  const csv = expensesToCSV(expenses);
+/** Columns for the dashboard's "Export Data" button. */
+const SIMPLE_HEADERS = ["Date", "Category", "Amount", "Description"] as const;
+
+/** Date, Category, Amount, Description — every expense, no filtering. */
+export function expensesToSimpleCSV(expenses: Expense[]): string {
+  const rows = [
+    SIMPLE_HEADERS.join(","),
+    ...expenses.map((expense) =>
+      [
+        escapeField(expense.date),
+        escapeField(CATEGORIES[expense.category].label),
+        escapeField(expense.amount.toFixed(2)),
+        escapeField(expense.description),
+      ].join(","),
+    ),
+  ];
+  return rows.join("\r\n");
+}
+
+/** Builds the file and hands it to the browser via a temporary anchor. */
+function triggerDownload(csv: string, filename: string): void {
   // The BOM makes Excel read the file as UTF-8 instead of the system codepage.
   const blob = new Blob([`﻿${csv}`], {
     type: "text/csv;charset=utf-8;",
@@ -52,10 +71,25 @@ export function downloadCSV(expenses: Expense[], filename?: string): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = filename ?? `expenses-${today()}.csv`;
+  link.download = filename;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   // Revoking immediately can cancel the download in some browsers.
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+export function downloadCSV(expenses: Expense[], filename?: string): void {
+  triggerDownload(
+    expensesToCSV(expenses),
+    filename ?? `expenses-${today()}.csv`,
+  );
+}
+
+/** The dashboard export: all expenses, four columns. */
+export function downloadSimpleCSV(expenses: Expense[], filename?: string): void {
+  triggerDownload(
+    expensesToSimpleCSV(expenses),
+    filename ?? `expenses-${today()}.csv`,
+  );
 }

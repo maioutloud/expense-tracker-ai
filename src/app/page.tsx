@@ -8,7 +8,12 @@ import { TrendChart } from "@/components/charts/TrendChart";
 import { StatCards } from "@/components/dashboard/StatCards";
 import { ExpenseList } from "@/components/expenses/ExpenseList";
 import { Button } from "@/components/ui/Button";
-import { ListIcon, PlusIcon, SparklesIcon } from "@/components/ui/Icons";
+import {
+  DownloadIcon,
+  ListIcon,
+  PlusIcon,
+  SparklesIcon,
+} from "@/components/ui/Icons";
 import {
   CardSkeleton,
   EmptyState,
@@ -24,6 +29,7 @@ import {
   totalOf,
 } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
+import { downloadSimpleCSV } from "@/lib/csv";
 import { monthKey, monthKeyOf, startOfMonth, daysBetween } from "@/lib/date";
 import { formatMonthKey } from "@/lib/format";
 
@@ -133,13 +139,24 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      <div className="mb-2">
-        <h1 className="text-xl font-semibold tracking-tight text-primary">
-          Dashboard
-        </h1>
-        <p className="mt-0.5 text-sm text-secondary">
-          Where your money went, at a glance.
-        </p>
+      <div className="mb-2 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-primary">
+            Dashboard
+          </h1>
+          <p className="mt-0.5 text-sm text-secondary">
+            Where your money went, at a glance.
+          </p>
+        </div>
+
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => downloadSimpleCSV(expenses)}
+          icon={<DownloadIcon width={16} height={16} />}
+        >
+          Export Data
+        </Button>
       </div>
 
       <StatCards stats={stats} sparkline={sparkline} />
