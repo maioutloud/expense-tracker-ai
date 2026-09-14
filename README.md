@@ -1,0 +1,188 @@
+# Ledger — Expense Tracker
+
+A personal expense tracker built with Next.js 14 (App Router), TypeScript, and Tailwind CSS.
+Everything lives in your browser's `localStorage` — no account, no server, no network calls.
+
+---
+
+## Running it
+
+```bash
+npm install     # already done if you're picking this up from the build
+npm run dev     # http://localhost:3000
+```
+
+Other scripts:
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server with hot reload |
+| `npm run build` | Production build |
+| `npm start` | Serve the production build (run `build` first) |
+| `npm run lint` | ESLint via `next lint` |
+| `npm run typecheck` | `tsc --noEmit` |
+
+> If port 3000 is taken: `npm run dev -- -p 3939`.
+
+---
+
+## Trying every feature
+
+The fastest path: open the app and click **Load sample data** on the empty state.
+That seeds ~150 days of realistic expenses so the charts, filters, and export all have
+something to chew on. It's seeded, so you get the same set every time.
+
+### Dashboard (`/`)
+
+1. **Summary cards** — month-to-date total (the hero number), month-over-month change,
+   all-time total, and average per day. The change indicator is red for *up* and green
+   for *down*, since for spending, up is the bad direction.
+2. **Cumulative sparkline** — the line under the hero number is this month's running total,
+   one point per elapsed day.
+3. **Spending by category** — donut chart. Hover a segment (or a legend row): the ring
+   center swaps from the total to that category's amount and share. Toggle
+   **This month / All time** in the card header.
+4. **Monthly spending** — the last six months as columns, empty months included. Hover
+   any column for its total and expense count.
+5. **Recent expenses** — the six newest, grouped by day. **View all** goes to the list.
+
+### Expenses (`/expenses`)
+
+1. **Search** — matches descriptions *and* category names. Try `coffee`, then `transport`.
+2. **Date range** — presets (this month, last month, last 7/30/90 days, this year) plus
+   **Custom range**, which reveals From/To date pickers.
+3. **Category chips** — click to toggle; multiple can be active at once.
+4. **Sort** — newest, oldest, highest amount, lowest amount. Day-grouping headers appear
+   only for the date sorts, since they'd be meaningless under an amount sort.
+5. **Clear filters** — appears in the toolbar as soon as any filter is active. The line
+   above it shows `N of M expenses`, and the page header shows the filtered total.
+6. **Export CSV** — exports *what's currently filtered*, not everything. Filter to one
+   category first and check the file to see it.
+7. **Clear all** — asks for confirmation, then offers one Undo in the notification.
+
+### Add / edit / delete
+
+- **Add expense** — the button in the top-right of every page.
+- **Edit** — hover a row (or focus it with the keyboard) and hit the pencil.
+- **Delete** — the trash icon. It deletes immediately and offers **Undo** in the toast for
+  7 seconds, which puts the row back in its original position. Bulk *Clear all* is the
+  operation that gets a confirmation dialog.
+
+### Validation — worth actually testing
+
+Open **Add expense** and press *Add expense* with everything blank: four errors appear at
+once and focus jumps to the first bad field. After that first submit, errors update live
+as you type. Specific cases:
+
+| Input | Result |
+|---|---|
+| Amount `0` or `-5` | "Amount must be greater than zero." |
+| Amount `1.234` | "Amounts are limited to 2 decimal places." |
+| Amount `$1,234.50` | **Accepted** — `$` and `,` are stripped |
+| Amount `abc` | "Use digits only, e.g. 24.99" |
+| A future date | "Date can't be in the future." (the picker is also capped) |
+| Description of 1 char | "Description is too short." |
+| No category | "Pick a category." |
+
+### Persistence
+
+Add a few expenses, then hard-reload. They're still there. Open DevTools →
+Application → Local Storage to see the `expense-tracker:expenses:v1` key.
+Corrupt one record's `amount` to a string and reload: that one row is dropped and the rest
+still load, rather than the app failing shut.
+
+### Theme, responsive, accessibility
+
+- The **sun/moon** button in the header toggles light/dark. It persists, and a blocking
+  inline script applies it before first paint so there's no white flash on reload. With no
+  saved preference the app follows your OS setting.
+- Resize to ~400px wide: the toolbar stacks, the donut moves above its legend, category
+  chips reflow, and row actions stay permanently visible (there's no hover on touch).
+- Tab through the app: there's a **Skip to content** link, a visible focus ring on
+  everything, and the modal traps focus, closes on `Escape`, and restores focus to
+  whatever opened it.
+
+---
+
+## How it's put together
+
+```
+src/
+├── app/
+│   ├── layout.tsx            Root layout, metadata, no-flash theme script
+│   ├── globals.css           Design tokens (light/dark) + component classes
+│   ├── page.tsx              Dashboard
+│   └── expenses/page.tsx     List, filters, export
+├── components/
+│   ├── Providers.tsx         The single client boundary + app chrome
+│   ├── charts/               DonutChart, TrendChart, Sparkline (hand-rolled SVG)
+│   ├── dashboard/StatCards.tsx
+│   ├── expenses/             ExpenseFormModal, ExpenseFilters, ExpenseList
+│   ├── layout/Navbar.tsx
+│   └── ui/                   Button, Modal, Toaster, ConfirmDialog, States, Icons
+├── context/
+│   ├── ExpenseProvider.tsx   Expense store + localStorage sync + dialog state
+│   ├── ThemeProvider.tsx     Theme with system/light/dark
+│   └── ToastProvider.tsx     Toast stack with undo actions
+└── lib/
+    ├── analytics.ts          Filtering, sorting, breakdowns, trends, stats
+    ├── categories.ts         The six categories and their series colors
+    ├── csv.ts                CSV serialization + download
+    ├── date.ts               Calendar-date helpers (timezone-safe)
+    ├── format.ts             Currency / percent / date formatting
+    ├── money.ts              Integer-cent arithmetic
+    ├── sample.ts             Seeded demo data
+    ├── storage.ts            localStorage read/write with per-record validation
+    ├── types.ts              Domain types
+    └── validation.ts         Form validation rules
+```
+
+### Decisions worth knowing about
+
+**Money is summed in integer cents.** Amounts are stored as dollars, but every total goes
+through `Math.round(amount * 100)` first. Summing 1,000 expenses of `$0.07` in plain
+floating point gives `70.00000000000004`; in cents it gives exactly `70`.
+
+**Dates are calendar dates, never instants.** `new Date("2026-03-01")` parses as *UTC*
+midnight, which renders as February 28 for anyone in a negative-offset timezone. Every
+parse in `lib/date.ts` goes through local-time constructors, and `parseISODate` rejects
+overflow dates like `2026-02-31` that the `Date` constructor would silently roll forward.
+
+**Chart colors are a validated palette, not taste.** The six category hues are assigned in
+a fixed slot order chosen for color-vision-deficiency separation — every adjacent pair
+clears a CVD ΔE of 8 and a normal-vision ΔE of 15, in both light and dark. Dark mode uses
+the same six hues re-stepped for the dark surface, not an automatic inversion. Three of the
+light-mode hues fall below 3:1 contrast against the surface, so the donut legend always
+writes out the category name, amount, and percentage — identity never depends on color
+alone. Reordering the categories in `lib/categories.ts` would invalidate this.
+
+**The charts have no dependencies.** The donut, column chart, and sparkline are inline SVG
+and CSS. That's a few hundred lines against ~500KB of charting library, and it means the
+2px inter-segment gaps, 4px rounded column caps, and theme-reactive colors behave exactly
+as specified.
+
+**Delete is undo, not confirm.** A modal on every delete trains people to dismiss modals.
+Single deletes are instant with a 7-second Undo that restores the row to its original
+index; only the bulk *Clear all* gets a confirmation dialog.
+
+**One bad record can't lock you out.** `loadExpenses` validates each stored record
+independently and drops malformed ones instead of throwing away the whole array.
+
+**CSV export is injection-safe.** Fields beginning with `= + - @` get a leading apostrophe,
+so a description like `=1+1` is text rather than a live formula when the file opens in
+Excel or Sheets. Quotes are doubled, fields with delimiters are quoted, lines are CRLF, and
+the file carries a UTF-8 BOM so Excel doesn't mangle non-ASCII.
+
+---
+
+## Known limits
+
+- **Currency is USD-formatted.** `Intl.NumberFormat` uses the browser's locale for
+  separators, but the currency code is hardcoded to `USD` in `lib/format.ts`. Making it
+  configurable means a setting plus a stored preference — it isn't wired up.
+- **Storage is per-browser.** No sync, no export/import of the raw JSON (CSV is one-way
+  out). Clearing site data clears the expenses.
+- **No recurring expenses, budgets, or attachments.** Out of scope for this build.
+- **`color-mix()` is used for category tints**, which needs a 2023-or-newer browser. Older
+  browsers lose the soft tint on selected chips but keep the colored ring, so nothing
+  becomes unreadable.

@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------
+   Design tokens.
+   Light values live on bare :root. Dark values are declared twice:
+   once under prefers-color-scheme (the OS setting) and once under
+   [data-theme="dark"] (the in-app toggle), so the toggle wins both ways.
+   ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+
+  --bg: #f9f9f7;
+  --surface: #fcfcfb;
+  --surface-2: #f3f2ee;
+  --border: #e1e0d9;
+  --border-strong: #c3c2b7;
+
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+
+  --brand: #4f46e5;
+  --brand-hover: #4338ca;
+  --brand-fg: #ffffff;
+  --brand-soft: #eef2ff;
+
+  --danger: #d03b3b;
+  --danger-soft: #fdf0f0;
+  --good: #006300;
+  --warning: #fab219;
+
+  /* Chart chrome */
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+
+  /* Categorical series — validated for the light surface (#fcfcfb).
+     Slot order is the CVD-safety mechanism; do not reorder. */
+  --cat-food: #2a78d6;
+  --cat-transportation: #eb6834;
+  --cat-entertainment: #1baf7a;
+  --cat-shopping: #eda100;
+  --cat-bills: #e87ba4;
+  --cat-other: #008300;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg: #0d0d0d;
+    --surface: #1a1a19;
+    --surface-2: #232321;
+    --border: #2c2c2a;
+    --border-strong: #383835;
+
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+
+    --brand: #818cf8;
+    --brand-hover: #a5b4fc;
+    --brand-fg: #14141f;
+    --brand-soft: #23233a;
+
+    --danger: #e66767;
+    --danger-soft: #2a1d1d;
+    --good: #0ca30c;
+    --warning: #fab219;
+
+    --grid: #2c2c2a;
+    --axis: #383835;
+
+    /* Same eight hues re-stepped for the dark surface (#1a1a19). */
+    --cat-food: #3987e5;
+    --cat-transportation: #d95926;
+    --cat-entertainment: #199e70;
+    --cat-shopping: #c98500;
+    --cat-bills: #d55181;
+    --cat-other: #008300;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0d0d0d;
+  --surface: #1a1a19;
+  --surface-2: #232321;
+  --border: #2c2c2a;
+  --border-strong: #383835;
+
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+
+  --brand: #818cf8;
+  --brand-hover: #a5b4fc;
+  --brand-fg: #14141f;
+  --brand-soft: #23233a;
+
+  --danger: #e66767;
+  --danger-soft: #2a1d1d;
+  --good: #0ca30c;
+  --warning: #fab219;
+
+  --grid: #2c2c2a;
+  --axis: #383835;
+
+  --cat-food: #3987e5;
+  --cat-transportation: #d95926;
+  --cat-entertainment: #199e70;
+  --cat-shopping: #c98500;
+  --cat-bills: #d55181;
+  --cat-other: #008300;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* One consistent focus ring across every interactive element. */
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Make the native date picker indicator follow the theme. */
+  :root[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.7);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1) opacity(0.7);
+    }
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-border bg-surface shadow-card;
+  }
+
+  .field {
+    @apply w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-primary
+           placeholder:text-muted transition-colors;
+  }
+
+  .field:hover:not(:disabled) {
+    border-color: var(--border-strong);
+  }
+
+  .field-invalid {
+    border-color: var(--danger);
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-secondary;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-surface-2;
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgba(137, 135, 129, 0.16),
+      transparent
+    );
+    animation: shimmer 1.4s infinite;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
