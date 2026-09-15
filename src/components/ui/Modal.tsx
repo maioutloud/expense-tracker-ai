@@ -24,7 +24,7 @@ export interface ModalProps {
   children: ReactNode;
   /** Rendered in a sticky footer; typically the action buttons. */
   footer?: ReactNode;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
 }
 
 export function Modal({
@@ -121,7 +121,9 @@ export function Modal({
         className={cn(
           "relative z-10 flex max-h-[92vh] w-full flex-col animate-scale-in",
           "rounded-t-2xl border border-border bg-surface shadow-pop sm:rounded-2xl",
-          size === "sm" ? "sm:max-w-sm" : "sm:max-w-lg",
+          size === "sm" && "sm:max-w-sm",
+          size === "md" && "sm:max-w-lg",
+          size === "lg" && "sm:max-w-3xl",
         )}
       >
         <header className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
