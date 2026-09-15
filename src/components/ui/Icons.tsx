@@ -170,3 +170,86 @@ export const MenuIcon = (props: IconProps) => (
     <path d="M4 7h16M4 12h16M4 17h16" />
   </Icon>
 );
+
+export const MailIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="m3.5 6.5 8.5 6 8.5-6" />
+  </Icon>
+);
+
+export const SheetIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
+  </Icon>
+);
+
+export const CloudIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M7 19a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 17.7 9.2 4 4 0 0 1 17.5 19H7Z" />
+  </Icon>
+);
+
+export const CloudUploadIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M7 18.5a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 17.7 8.7 4 4 0 0 1 17.8 16.6" />
+    <path d="M12 21v-8" />
+    <path d="m9 15.5 3-3 3 3" />
+  </Icon>
+);
+
+export const LinkIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M10.5 13.5a4 4 0 0 0 5.66 0l2.5-2.5a4 4 0 1 0-5.66-5.66l-1.3 1.3" />
+    <path d="M13.5 10.5a4 4 0 0 0-5.66 0l-2.5 2.5a4 4 0 1 0 5.66 5.66l1.3-1.3" />
+  </Icon>
+);
+
+export const ClockIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5.2l3.2 1.9" />
+  </Icon>
+);
+
+export const HistoryIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" />
+    <path d="M3 4v4h4" />
+    <path d="M12 7.5V12l3 1.8" />
+  </Icon>
+);
+
+export const CopyIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <rect x="9" y="9" width="11" height="11" rx="2" />
+    <path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3" />
+  </Icon>
+);
+
+export const ShareIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <circle cx="18" cy="5.5" r="2.5" />
+    <circle cx="6" cy="12" r="2.5" />
+    <circle cx="18" cy="18.5" r="2.5" />
+    <path d="m8.2 10.8 7.6-4M8.2 13.2l7.6 4" />
+  </Icon>
+);
+
+export const LayersIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="m12 3 9 5-9 5-9-5 9-5Z" />
+    <path d="m3.5 12.5 8.5 4.7 8.5-4.7" />
+    <path d="m3.5 16.5 8.5 4.7 8.5-4.7" />
+  </Icon>
+);
+
+export const UnplugIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M6 20 4 22" />
+    <path d="m9 11-4 4a3.5 3.5 0 0 0 5 5l4-4" />
+    <path d="M18 4l2-2" />
+    <path d="m15 13 4-4a3.5 3.5 0 0 0-5-5l-4 4" />
+  </Icon>
+);

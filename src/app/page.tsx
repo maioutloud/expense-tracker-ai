@@ -5,10 +5,16 @@ import Link from "next/link";
 
 import { DonutChart } from "@/components/charts/DonutChart";
 import { TrendChart } from "@/components/charts/TrendChart";
+import { ExportHub } from "@/components/cloud/ExportHub";
 import { StatCards } from "@/components/dashboard/StatCards";
 import { ExpenseList } from "@/components/expenses/ExpenseList";
 import { Button } from "@/components/ui/Button";
-import { ListIcon, PlusIcon, SparklesIcon } from "@/components/ui/Icons";
+import {
+  CloudUploadIcon,
+  ListIcon,
+  PlusIcon,
+  SparklesIcon,
+} from "@/components/ui/Icons";
 import {
   CardSkeleton,
   EmptyState,
@@ -32,6 +38,7 @@ type Scope = "month" | "all";
 export default function DashboardPage() {
   const { expenses, status, error, openForm, loadSampleData } = useExpenses();
   const [scope, setScope] = useState<Scope>("month");
+  const [hubOpen, setHubOpen] = useState(false);
 
   const now = useMemo(() => new Date(), []);
 
@@ -133,13 +140,24 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      <div className="mb-2">
-        <h1 className="text-xl font-semibold tracking-tight text-primary">
-          Dashboard
-        </h1>
-        <p className="mt-0.5 text-sm text-secondary">
-          Where your money went, at a glance.
-        </p>
+      <div className="mb-2 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-primary">
+            Dashboard
+          </h1>
+          <p className="mt-0.5 text-sm text-secondary">
+            Where your money went, at a glance.
+          </p>
+        </div>
+
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => setHubOpen(true)}
+          icon={<CloudUploadIcon width={16} height={16} />}
+        >
+          Export &amp; share
+        </Button>
       </div>
 
       <StatCards stats={stats} sparkline={sparkline} />
@@ -230,6 +248,8 @@ export default function DashboardPage() {
         </div>
         <ExpenseList expenses={recent} sort="date-desc" />
       </section>
+
+      <ExportHub open={hubOpen} onClose={() => setHubOpen(false)} />
     </div>
   );
 }

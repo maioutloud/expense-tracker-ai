@@ -58,6 +58,14 @@ const config: Config = {
           from: { opacity: "0", transform: "translateX(12px)" },
           to: { opacity: "1", transform: "translateX(0)" },
         },
+        "slide-in-right": {
+          from: { opacity: "0", transform: "translateX(24px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
+        },
+        "pulse-soft": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.45" },
+        },
         shimmer: {
           "100%": { transform: "translateX(100%)" },
         },
@@ -66,6 +74,8 @@ const config: Config = {
         "fade-in": "fade-in 160ms ease-out",
         "scale-in": "scale-in 180ms cubic-bezier(0.16,1,0.3,1)",
         "slide-in": "slide-in 200ms cubic-bezier(0.16,1,0.3,1)",
+        "slide-in-right": "slide-in-right 240ms cubic-bezier(0.16,1,0.3,1)",
+        "pulse-soft": "pulse-soft 1.8s ease-in-out infinite",
       },
     },
   },
